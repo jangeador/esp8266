@@ -1,0 +1,33 @@
+import machine
+import ubinascii
+
+CONFIG = {
+    "ssid": "ssid",
+    "psk": "psk",
+    "broker": "192.168.1.19",
+    "sensor_pin": 0,
+    "client_id": b"esp8266_" + ubinascii.hexlify(machine.unique_id()),
+    "topic": b"home",
+}
+
+
+def save_config():
+    import ujson as json
+    try:
+        with open("/config.json", "w") as f:
+            f.write(json.dumps(CONFIG))
+    except OSError:
+        print("Couldn't save /config.json")
+
+
+def load_config():
+    import ujson as json
+    try:
+        with open("/config.json") as f:
+            config = json.loads(f.read())
+    except (OSError, ValueError):
+        print("Couldn't load /config.json")
+        save_config()
+    else:
+        CONFIG.update(config)
+        print("Loaded config from /config.json")
